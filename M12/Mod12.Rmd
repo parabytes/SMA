@@ -1,0 +1,173 @@
+---
+title: "Social Media Analytics"
+subtitle: "Module 9 Assignment"
+date: "November 22, 2020"
+author: "Paras Ahuja"
+output:
+  pdf_document:  default
+  html_notebook: default
+---
+
+[^1]: https://www.rdocumentation.org/packages/networkdata/versions/0.1.4
+[^2]: https://www.rdocumentation.org/packages/networkdata/versions/0.1.4/topics/covert_29
+[^3]: http://www.thenetworkthinkers.com/2009/02/madoff-feeder-funds.html.
+[^4]: https://www.sec.gov.edgekey-staging.net/news/studies/2009/oig-509/exhibit-0156.pdf
+
+# Abstract
+
+In this paper we analyze Bernie Madoff Fraud network data available through networkdata library in R.[^1] Bernie Madoff was involved in a massive financial fraud in the USA and was sentenced to 150 years in prison. This network consists of transaction flows between financial institutions and Madoff. Note that networkdata library is not available by default in the newer versions of RStudio, and R, therefore the package must be installed by utilizing the following code:
+
+```{r, results="hide", message=FALSE}
+remotes::install_github("schochastics/networkdata")
+```
+
+# Data Collection 
+
+Data for this network was gathered from various news sources and court documents. David Schoch, creator of the dataset cites The Network Thinkers (TNT) blog as his inspiration.[^2] Furthermore, The Wall Street Journal had published a list of names and addresses of people who fell victim to the ponzi scheme. The document published by The Wall Street Journal is 162 pages long.[^3]
+
+# Data Files and Formats
+
+All datasets in networkdata are an igraph object, including the dataset in question. In order to use statnet on this data, we need to use intergraph package of R so that we may convert igraph to a network object in statnet. The data represents directed network 61 x 61 firm by firm, showing money flows financial institutions and other organizations, leading ultimately to Bernie Madoff's fund. Relations are money flows. Arrows show direction of money flow.
+
+# Data Details
+
+Since this is network data we have ample network statistics available here, which is what we utilize here as details. We first load the required libraries and proceed accordingly.
+
+```{r, results="hide", message=FALSE, fig1, fig.height = 7.5, fig.width = 20, fig.align="center"}
+library(statnet)
+library(igraph)
+library(networkdata)
+data("covert_29")
+
+matrix <- as_adjacency_matrix(covert_29, type = c("both", "upper", "lower"),
+                              attr = NULL, edges = FALSE, names = TRUE,
+                              sparse = igraph_opt("sparsematrices"))
+
+network <- network(matrix, directed=TRUE, loops=FALSE)
+
+plot.network(network,
+             vertex.col = "White",
+             displaylabels = T,
+             label.cex = 0.7,
+             vertex.cex= betweenness(covert_29)/100,
+             label = ifelse(betweenness(covert_29)/100 > 5, 
+                            V(covert_29)$name, NA),
+             label.pos = 5)
+
+```
+
+We notice here that Bernie Madoff Investment has a betweenness centrality of greater than 5. Betweenness centrality is a measure of number of time a node acts as a bridge between two other nodes. We also notice that there are a few large financial institutions that perhaps facilitated Bernie Madoff's rise. By simply lowering the betweenness centrality requirement to 2, we find out that chief among Madoff's clients and ultimately victims, were Cohmad Securities, Fairfield Greenwich, Bank Medici, Tremont Group Holdings, and Gabriel Capital. Another interesting measure to dwell upon is degree centrality. Degree centrality is defined as the number of links incident upon a node. Just by looking at the graph we notice that Madoff certainly had a lot of connections. 
+
+Below we notice that Bernie Madoff, for obvious reasons, has the highest degree centrality. What's also interesting is that two of his clients seemed to have acted as a conduit. 
+
+```{r, results="hide", message=FALSE, fig2, fig.height = 7.5, fig.width = 20, fig.align="center"}
+plot.network(network,
+             vertex.col = "White",
+             displaylabels = T,
+             label.cex = 0.7,
+             vertex.cex= degree(covert_29),
+             label = ifelse(degree(covert_29) > 5, 
+                            V(covert_29)$name, " "),
+             label.pos = 5)
+```
+
+# Existing Publications
+
+Nearly all existing publications are either from financial institutions, news media, SEC, or court documents. There are not many research papers that have been written about Madoff, and his fall. One document that served as division exhibit 8 in SEC filings against Madoff is Barron's report published on May 07, 2001. It's title: **Don't Ask, Don't Tell: Bernie Madoff is so secretive, he even asks his investors to keep mum.[^4]**
+
+# ERGM
+
+Note that the network has no attributes, and simply consists of adjacency matrix, and directed graph indicating direction of the transaction. Furthermore, attributes can be collected from publicly available information. One attribute that can be collected to expand the dataset is money lost by the investors, and their country. However, not all investors chose to reveal the amount they lost so attribute information will be incomplete. Country of investor is available in documents revealed by the news media.
+
+```{r, message=FALSE}
+
+e2 <- ergm(network~edges)
+summary(e2)
+
+```
+
+```{r, message=FALSE}
+
+e1 <- ergm(network~edges+triangle)
+summary(e1)
+
+```
+
+# RSiena s50
+```{r, message=FALSE, tidy=TRUE}
+
+library(RSiena)
+
+```
+
+## Step 1
+```{r, message=FALSE, tidy=TRUE}
+
+s501d <- read.table("s50-network1.dat", header=FALSE, sep=" ", quote="\"'")
+s502d <- read.table("s50-network2.dat", header=FALSE, sep=" ", quote="\"'")
+s503d <- read.table("s50-network3.dat", header=FALSE, sep=" ", quote="\"'")
+
+s501 <- as.matrix(s501d[,2:51])
+s502 <- as.matrix(s502d[,2:51])
+s503 <- as.matrix(s503d[,2:51])
+
+s50a<-read.table("s50-alcohol.dat", header=FALSE, sep=" ", quote="\"'")
+s50s<-read.table("s50-smoke.dat", header=FALSE, sep=" ", quote="\"'")
+```
+
+## Step 2
+
+```{r, message=FALSE, tidy=TRUE}
+
+friend.data.w1 <- s501
+friend.data.w2 <- s502
+friend.data.w3 <- s503
+drink <- as.matrix(s50a[,2:4])
+smoke <- as.matrix(s50s[,2:4])
+
+friendship <- sienaDependent(array(c(friend.data.w1, friend.data.w2, 
+                                     friend.data.w3), 
+                                  dim=c(50, 50, 3)))
+
+smoke1 <- coCovar(smoke[, 1])
+alcohol <- varCovar(drink)
+mydata <- sienaDataCreate(friendship, smoke1, alcohol)
+```
+
+## Step 3
+
+```{r, message=FALSE, results="hide", tidy=TRUE}
+
+myeff <- getEffects(mydata)
+myalgorithm <- sienaAlgorithmCreate(projname="s50_3")
+myeff <- includeEffects(myeff, transTrip, cycle3)
+myeff <- includeEffects(myeff, egoX, altX, egoXaltX, interaction1 = "alcohol")
+myeff <- includeEffects(myeff, simX, interaction1 = "smoke1")
+
+```
+
+```{r, message=FALSE, results="hide", tidy=TRUE}
+
+ans <- siena07(myalgorithm, data=mydata, effects=myeff)
+ans
+
+```
+
+```{r, message=FALSE, tidy=TRUE}
+
+myeff[myeff$effectName=='transitive triplets' 
+      & myeff$type=='eval', 'include'] <- TRUE
+myeff[myeff$effectName=='3-cycles' 
+      & myeff$type=='eval', 'include'] <- FALSE
+myeff[myeff$effectName=='smoke1 similarity' 
+      & myeff$type=='eval', 'include'] <- FALSE
+myeff[myeff$effectName=='alcohol alter' 
+      & myeff$type=='eval', 'include'] <- FALSE
+myeff[myeff$effectName=='alcohol ego' 
+      & myeff$type=='eval', 'include'] <- FALSE
+myeff[myeff$effectName=='alcohol ego x alcohol alter' 
+      & myeff$type=='eval', 'include'] <- TRUE
+
+ans <- siena07(myalgorithm, data=mydata, effects=myeff)
+ans
+```

@@ -1,0 +1,120 @@
+
+
+-----------------------------------
+New Analysis started.
+Date and time: 18/10/2016 11:50:17
+New results follow.
+-----------------------------------
+
+Siena version 1.1-232 (18 Jun 13)
+
+@1
+Estimation by stochastic approximation algorithm.
+=================================================
+
+Random initialization of random number stream.
+Current random number seed is 685609.
+Effects object used: myeff 
+Model Type 1: Standard actor-oriented model
+Estimation method: conditional moment estimation
+Conditioning variable is the total number of observed changes ("distance") 
+in the network variable.
+Distances for simulations are
+period   :   1   2
+distance :  115 106.
+Standard errors are estimated with the likelihood ratio method.
+Initial value of gain parameter is  0.2000000.
+Number of subphases in Phase 2 is 4.
+
+Initial parameter values are 
+  0.1  Rate parameter                         4.6960
+  0.2  Rate parameter                         4.3288
+  1. eval:  outdegree (density)                            -1.4677
+  2. eval:  reciprocity                                     0.0000
+  3. eval:  transitive triplets                             0.0000
+  4. eval:  3-cycles                                        0.0000
+  5. eval:  smoke1 similarity                               0.0000
+  6. eval:  alcohol alter                                   0.0000
+  7. eval:  alcohol ego                                     0.0000
+  8. eval:  alcohol ego x alcohol alter                     0.0000
+
+
+Observed values of target statistics are
+  1. Number of ties                                                     238.0000
+  2. Number of reciprocated ties                                        160.0000
+  3. Number of transitive triplets                                      225.0000
+  4. 3-cycles                                                            72.0000
+  5. Similarity on smoke1                                                23.0371
+  6. Sum of indegrees x alcohol                                          12.3800
+  7. Sum of outdegrees x alcohol                                         20.3800
+  8. Sum alcohol ego x alcohol alter                                    152.3038
+
+ 8 parameters, 8 statistics
+
+Estimation of derivatives by the LR method (type 1).
+
+@2
+End of stochastic approximation algorithm, phase 3.
+---------------------------------------------------
+
+Total of 2235 iterations.
+Parameter estimates based on 1235 iterations,
+basic rate parameters as well as 
+convergence diagnostics, covariance and derivative matrices based on 1000 iterations.
+
+Information for convergence diagnosis.
+Averages, standard deviations, and t-ratios for deviations from targets:
+  1.   0.2660  21.8433   0.0122 
+  2.   0.2860  20.8387   0.0137 
+  3.   2.3970  66.2065   0.0362 
+  4.   0.9960  21.5242   0.0463 
+  5.  -0.1258   6.5067  -0.0193 
+  6.   0.0437  22.2864   0.0020 
+  7.   1.7147  21.5610   0.0795 
+  8.   1.1746  28.8942   0.0407 
+
+Good convergence is indicated by the t-ratios being close to zero.
+
+
+@2
+Estimation Results.
+-------------------
+
+Regular end of estimation algorithm.
+Total of 2235 iteration steps.
+
+@3
+Estimates and standard errors
+                             
+Rate parameters:
+ 0.1  Rate parameter period 1                 6.5354  (   1.1224)
+ 0.2  Rate parameter period 2                 5.2249  (   0.8782)
+
+Other parameters:
+ 1. eval:  outdegree (density)                          -2.7242  (   0.1271)
+ 2. eval:  reciprocity                                   2.4365  (   0.2336)
+ 3. eval:  transitive triplets                           0.6463  (   0.1420)
+ 4. eval:  3-cycles                                     -0.0865  (   0.3011)
+ 5. eval:  smoke1 similarity                             0.2529  (   0.2027)
+ 6. eval:  alcohol alter                                -0.0298  (   0.0693)
+ 7. eval:  alcohol ego                                   0.0459  (   0.0783)
+ 8. eval:  alcohol ego x alcohol alter                   0.1285  (   0.0497)
+
+@3
+Covariance matrices
+                   
+Covariance matrix of estimates (correlations below diagonal):
+     0.016     -0.020     -0.006      0.006     -0.002      0.001     -0.001     -0.001
+    -0.658      0.055      0.009     -0.026     -0.003     -0.001      0.001     -0.001
+    -0.317      0.282      0.020     -0.037     -0.002      0.000     -0.001     -0.001
+     0.147     -0.375     -0.867      0.091      0.006      0.000      0.003      0.001
+    -0.096     -0.056     -0.085      0.097      0.041      0.003      0.004     -0.001
+     0.058     -0.070     -0.034      0.004      0.244      0.005     -0.002      0.000
+    -0.074      0.074     -0.104      0.116      0.281     -0.294      0.006     -0.001
+    -0.131     -0.069     -0.097      0.072     -0.091     -0.049     -0.132      0.002
+
+Derivative matrix of expected statistics X by parameters and
+covariance/correlation matrix of X can be found using
+summary(ans) within R, or by using the 'verbose' option in Siena07.
+ 
+Total computation time 12.17 seconds.
